@@ -16,6 +16,17 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            agent { label 'compile' }
+            steps {
+                sh '''
+                    mvn clean install
+                    sleep 5
+                    cp target/webapp-0.1.jar ~/builds/
+                '''
+            }
+        }
+
         stage('SonarQube Analysis') {
             agent { label 'compile' }
             steps {
@@ -25,22 +36,11 @@ pipeline {
                         -Dsonar.projectKey=web-app \
                         -Dsonar.projectName="web app" \
                         -Dsonar.sources=src \
-			-Dsonar.exclusions=**/*.class \
-			-Dsonar.projectVersion=${BUILD_NUMBER} \
-			-Dsonar.branch.name=${BRANCH_NAME}
+                        -Dsonar.java.binaries=target/classes \
+						-Dsonar.projectVersion=${BUILD_NUMBER} \
+						-Dsonar.branch.name=${BRANCH_NAME}
                     '''
                 }
-            }
-        }
-
-        stage('Build') {
-            agent { label 'compile' }
-            steps {
-                sh '''
-                    mvn clean install
-                    sleep 5
-                    cp target/webapp-0.1.jar ~/builds/
-                '''
             }
         }
 

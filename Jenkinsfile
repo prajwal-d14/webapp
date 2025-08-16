@@ -25,9 +25,8 @@ pipeline {
                         -Dsonar.projectKey=web-app \
                         -Dsonar.projectName="web app" \
                         -Dsonar.sources=src \
-                        -Dsonar.java.binaries=target/classes \
-						-Dsonar.projectVersion=${BUILD_NUMBER} \
-						-Dsonar.branch.name=${BRANCH_NAME}
+			-Dsonar.projectVersion=${BUILD_NUMBER} \
+			-Dsonar.branch.name=${BRANCH_NAME}
                     '''
                 }
             }

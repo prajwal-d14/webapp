@@ -25,6 +25,7 @@ pipeline {
                         -Dsonar.projectKey=web-app \
                         -Dsonar.projectName="web app" \
                         -Dsonar.sources=src \
+			-Dsonar.exclusions=**/*.class \
 			-Dsonar.projectVersion=${BUILD_NUMBER} \
 			-Dsonar.branch.name=${BRANCH_NAME}
                     '''

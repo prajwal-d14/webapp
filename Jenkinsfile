@@ -80,7 +80,7 @@ pipeline {
             agent { label 'image' }
             steps {
                 sh """
-                    cd webapp-deploy
+                    cd ¬/webapp-deploy
                     sed -i 's/webapp:1/webapp:${BUILD_NUMBER}/g' deployment.yml
                     git add deployment.yml
                     git commit -m "Updated image to build ${BUILD_NUMBER}"

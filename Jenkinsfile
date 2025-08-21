@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         SONAR_SERVER = 'SonarServer' 
-        NEXUS_IP = '13.127.150.83'       
-        NEXUS_URL = "http://${NEXUS_IP}:31020/repository/bankartifact-repo/webapp-1.jar"
+        NEXUS_IP = '43.204.130.40'       
+        NEXUS_URL = "http://${NEXUS_IP}:31020/repository/bankartifact-repo/webapp-${BUILD_NUMBER}.jar"
         DOCKER_IMAGE = "${NEXUS_IP}:31503/docker-repo-bank/webapp:${BUILD_NUMBER}"
     }
 
@@ -22,7 +22,7 @@ pipeline {
                 sh '''
                     mvn clean install
                     sleep 5
-                    cp target/webapp-0.1.jar ~/builds/
+                    cp target/webapp-0.1.jar ~/builds/webapp-${BUILD_NUMBER}.jar
                 '''
             }
         }
@@ -47,13 +47,11 @@ pipeline {
         stage('Upload Artifact to Nexus') {
             agent { label 'compile' }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-cred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh """
-                        curl -u $USERNAME:$PASSWORD \
-                          --upload-file ~/builds/ webapp-0.1.jar \
+                        curl -v  \
+                          --upload-file ~/builds/webapp-${BUILD_NUMBER}.jar \
                           $NEXUS_URL
                     """
-                }
             }
         }
 
@@ -61,7 +59,10 @@ pipeline {
             agent { label 'image' }
             steps {
                     sh """
-                         docker build -t webapp:${BUILD_NUMBER} .
+                        docker build \
+                        --build-arg BUILD_NUMBER=${BUILD_NUMBER} \
+                        --build-arg NEXUS_IP=${NEXUS_IP} \
+                        -t webapp:${BUILD_NUMBER} .
                     """
 				}	
             } 
@@ -75,7 +76,7 @@ pipeline {
                 """
             }
         }
-
+        
         stage('argocd stage') {
             agent { label 'image' }
             steps {
